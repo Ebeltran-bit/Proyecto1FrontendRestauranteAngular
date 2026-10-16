@@ -1,0 +1,50 @@
+<header class="page-header">
+  <div>
+    <h1>{{ 'staff.title' | t }}</h1>
+    <p>{{ 'staff.subtitle' | t }}</p>
+  </div>
+  <button mat-flat-button (click)="create()">
+    <mat-icon>person_add</mat-icon>
+    {{ 'staff.add' | t }}
+  </button>
+</header>
+
+@if (loading()) {
+  <div class="center-spinner"><mat-spinner diameter="40" /></div>
+} @else {
+  @for (group of groups(); track group.title) {
+    <section class="group">
+      <h2>
+        {{ group.title | t }} <span class="muted">{{ group.users.length }}</span>
+      </h2>
+      <div class="people">
+        @for (user of group.users; track user.id) {
+          <article class="card person">
+            <span class="avatar" [class.manager]="user.role === 'manager'">{{
+              initials(user.full_name)
+            }}</span>
+            <div class="person-info">
+              <strong>
+                {{ user.full_name }}
+                @if (user.id === auth.user()?.id) {
+                  <span class="chip neutral">{{ 'staff.you' | t }}</span>
+                }
+              </strong>
+              <span class="muted">&#64;{{ user.username }} · {{ roleKey(user.role) | t }}</span>
+            </div>
+            @if (user.id !== auth.user()?.id) {
+              <button
+                mat-icon-button
+                (click)="remove(user)"
+                [matTooltip]="'common.delete' | t"
+                [attr.aria-label]="('common.delete' | t) + ' ' + user.full_name"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </article>
+        }
+      </div>
+    </section>
+  }
+}

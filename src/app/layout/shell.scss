@@ -1,0 +1,141 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+  padding: 0 16px;
+  background: color-mix(in srgb, var(--mat-sys-surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.brand-link {
+  color: inherit;
+  text-decoration: none;
+  margin-right: 16px;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+
+  a.active {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user-button {
+  height: 48px;
+  padding: 0 8px;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  font: var(--mat-sys-label-large);
+  font-weight: 600;
+}
+
+.user-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 10px;
+  line-height: 1.2;
+}
+
+.user-name {
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.user-role {
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.menu-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: auto;
+  min-height: 56px;
+  opacity: 1;
+}
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+  box-sizing: border-box;
+}
+
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: var(--mat-sys-surface-container);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 16px;
+    color: var(--mat-sys-on-surface-variant);
+    text-decoration: none;
+    font: var(--mat-sys-label-medium);
+
+    &.active {
+      color: var(--mat-sys-on-secondary-container);
+      background: var(--mat-sys-secondary-container);
+    }
+  }
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only {
+    display: flex;
+  }
+  .topbar {
+    padding: 0 8px;
+  }
+  .brand-link {
+    margin-right: 0;
+  }
+  .page {
+    padding: 20px 16px 32px;
+  }
+}

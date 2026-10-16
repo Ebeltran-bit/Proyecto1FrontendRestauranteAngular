@@ -1,0 +1,87 @@
+<header class="page-header">
+  <div>
+    <h1>{{ 'floor.title' | t }}</h1>
+    <p>{{ 'floor.subtitle' | t }}</p>
+  </div>
+  <div class="refresh">
+    @if (updatedAt(); as updated) {
+      <span class="muted">{{ 'floor.updated' | t: { time: (updated | localDate: 'time') } }}</span>
+    }
+    <button mat-stroked-button (click)="load()" [disabled]="loading()">
+      <mat-icon>refresh</mat-icon>
+      {{ 'floor.refresh' | t }}
+    </button>
+  </div>
+</header>
+
+@if (loading() && !tables().length) {
+  <div class="center-spinner"><mat-spinner diameter="40" /></div>
+} @else if (failed() && !tables().length) {
+  <div class="card empty-state">
+    <mat-icon>cloud_off</mat-icon>
+    <h3>{{ 'errors.loadFailed' | t }}</h3>
+    <button mat-flat-button (click)="load()">{{ 'common.retry' | t }}</button>
+  </div>
+} @else {
+  <section class="stats">
+    <div class="card stat">
+      <span class="stat-icon occupied"><mat-icon>groups</mat-icon></span>
+      <div>
+        <span class="stat-label">{{ 'floor.occupied' | t }}</span>
+        <strong>{{ occupied() }} / {{ tables().length }}</strong>
+      </div>
+    </div>
+    <div class="card stat">
+      <span class="stat-icon free"><mat-icon>event_seat</mat-icon></span>
+      <div>
+        <span class="stat-label">{{ 'floor.free' | t }}</span>
+        <strong>{{ free() }}</strong>
+      </div>
+    </div>
+    <div class="card stat">
+      <span class="stat-icon money-icon"><mat-icon>payments</mat-icon></span>
+      <div>
+        <span class="stat-label">{{ 'floor.openTotal' | t }}</span>
+        <strong class="money">{{ openTotal() | money }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="tables">
+    @for (table of tables(); track table.id) {
+      <a
+        class="card table-card"
+        [class.occupied]="table.status === 'occupied'"
+        [routerLink]="['mesa', table.id]"
+      >
+        <div class="table-top">
+          <h2>{{ table.name }}</h2>
+          <span class="chip" [class]="table.status">
+            {{ (table.status === 'free' ? 'floor.statusFree' : 'floor.statusOccupied') | t }}
+          </span>
+        </div>
+        <div class="table-total money">{{ table.total | money }}</div>
+        <div class="table-meta">
+          <span>
+            <mat-icon>receipt</mat-icon>
+            @switch (table.order_count) {
+              @case (0) {
+                {{ 'floor.noOrders' | t }}
+              }
+              @case (1) {
+                {{ 'floor.oneOrder' | t }}
+              }
+              @default {
+                {{ 'floor.orders' | t: { count: table.order_count } }}
+              }
+            }
+          </span>
+          <span [class.muted]="!table.waiter_name">
+            <mat-icon>person</mat-icon>
+            {{ table.waiter_name ?? ('floor.noWaiter' | t) }}
+          </span>
+        </div>
+      </a>
+    }
+  </section>
+}

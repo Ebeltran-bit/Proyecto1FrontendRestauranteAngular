@@ -1,0 +1,135 @@
+<header class="page-header">
+  <div>
+    <h1>{{ 'history.title' | t }}</h1>
+    <p>
+      {{ 'history.subtitle' | t }} · <span class="day-label">{{ day() | localDate: 'long' }}</span>
+    </p>
+  </div>
+  <div class="day-picker">
+    <button mat-icon-button (click)="shiftDay(-1)" [attr.aria-label]="'history.previousDay' | t">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <mat-form-field subscriptSizing="dynamic" class="date-field">
+      <mat-label>{{ 'history.day' | t }}</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [max]="today"
+        [value]="day()"
+        (dateChange)="setDay($event.value)"
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+    </mat-form-field>
+    <button
+      mat-icon-button
+      (click)="shiftDay(1)"
+      [disabled]="isToday()"
+      [attr.aria-label]="'history.nextDay' | t"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    @if (!isToday()) {
+      <button mat-stroked-button (click)="setDay(today)">{{ 'history.today' | t }}</button>
+    }
+  </div>
+</header>
+
+@if (loading() && !report()) {
+  <div class="center-spinner"><mat-spinner diameter="40" /></div>
+} @else if (report(); as report) {
+  <section class="kpis">
+    <div class="card kpi primary">
+      <span class="kpi-label"><mat-icon>euro</mat-icon>{{ 'history.revenue' | t }}</span>
+      <strong class="money">{{ report.total | money }}</strong>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label"><mat-icon>receipt_long</mat-icon>{{ 'history.bills' | t }}</span>
+      <strong>{{ report.bills }}</strong>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label"><mat-icon>trending_up</mat-icon>{{ 'history.average' | t }}</span>
+      <strong class="money">{{ report.average_ticket | money }}</strong>
+    </div>
+  </section>
+
+  @if (report.bills) {
+    <div class="grid">
+      <section class="card">
+        <h2 class="card-title">{{ 'history.byWaiter' | t }}</h2>
+        <ul class="bars">
+          @for (waiter of report.by_waiter; track waiter.waiter_id) {
+            <li>
+              <div class="bar-head">
+                <span>{{ waiter.waiter_name }}</span>
+                <span class="money">{{ waiter.total | money }}</span>
+              </div>
+              <div class="bar"><span [style.width]="barWidth(waiter.total)"></span></div>
+              <span class="muted small">{{
+                (waiter.bills === 1 ? 'history.oneBill' : 'history.billCount')
+                  | t: { count: waiter.bills }
+              }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">{{ 'history.topProducts' | t }}</h2>
+        <ol class="top">
+          @for (product of report.top_products; track product.product_id; let i = $index) {
+            <li>
+              <span class="rank">{{ i + 1 }}</span>
+              <span class="top-name">{{ product.product_name }}</span>
+              <span class="muted">{{ 'history.units' | t: { count: product.quantity } }}</span>
+              <span class="money">{{ product.total | money }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    </div>
+  }
+
+  <section class="card bills">
+    <h2 class="card-title">{{ 'history.paidBills' | t }}</h2>
+    @if (bills().length) {
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{{ 'history.time' | t }}</th>
+            <th>{{ 'ticket.table' | t }}</th>
+            <th class="hide-mobile">{{ 'ticket.waiter' | t }}</th>
+            <th class="right">{{ 'table.total' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bill of bills(); track bill.id) {
+            <tr>
+              <td class="muted">{{ bill.id }}</td>
+              <td>{{ bill.paid_at | localDate: 'time' }}</td>
+              <td>{{ bill.table_name }}</td>
+              <td class="hide-mobile">{{ bill.waiter_name }}</td>
+              <td class="right money strong">{{ bill.total | money }}</td>
+              <td class="right">
+                <button
+                  mat-icon-button
+                  (click)="showTicket(bill)"
+                  [attr.aria-label]="'history.viewTicket' | t"
+                >
+                  <mat-icon>receipt</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="empty-state">
+        <mat-icon>receipt_long</mat-icon>
+        <p>{{ 'history.noBills' | t }}</p>
+      </div>
+    }
+  </section>
+}

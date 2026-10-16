@@ -1,1 +1,253 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// Material 3 theme. `color-scheme` decides whether every --mat-sys-* colour
+// takes its light or its dark value, so switching themes is one class on <html>.
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$orange-palette,
+        tertiary: mat.$azure-palette,
+      ),
+      typography: (
+        plain-family: (
+          'Inter',
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif,
+        ),
+        brand-family: (
+          'Inter',
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif,
+        ),
+      ),
+      density: 0,
+    )
+  );
+
+  // App colours that Material does not provide, for states and money.
+  --app-success: #1b7f4b;
+  --app-success-container: #d4f5e2;
+  --app-on-success-container: #0b3d22;
+  --app-warning: #9a5b00;
+  --app-warning-container: #ffe7c2;
+  --app-on-warning-container: #4a2a00;
+  --app-danger: #ba1a1a;
+  --app-radius: 18px;
+}
+
+html.dark-theme {
+  color-scheme: dark;
+
+  --app-success: #6ddc9f;
+  --app-success-container: #0f4a2b;
+  --app-on-success-container: #c4f5d8;
+  --app-warning: #ffb95c;
+  --app-warning-container: #5a3500;
+  --app-on-warning-container: #ffddb0;
+  --app-danger: #ffb4ab;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.dark-theme body {
+  background: var(--mat-sys-surface);
+}
+
+// Shared page building blocks
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-medium);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.card {
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--app-radius);
+}
+
+html.dark-theme .card {
+  background: var(--mat-sys-surface-container);
+}
+
+.card-title {
+  margin: 0;
+  padding: 18px 20px 0;
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.money {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    color: var(--mat-sys-outline);
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-title-medium);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+  font-weight: 600;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.free {
+    background: var(--app-success-container);
+    color: var(--app-on-success-container);
+  }
+
+  &.occupied {
+    background: var(--app-warning-container);
+    color: var(--app-on-warning-container);
+  }
+
+  &.neutral {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.danger-button.mat-mdc-unelevated-button:not(:disabled) {
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.center-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+// Snack bars
+.snack-success {
+  --mat-snack-bar-container-color: var(--app-success-container);
+  --mat-snack-bar-supporting-text-color: var(--app-on-success-container);
+}
+
+.snack-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error-container);
+}
+
+// Dialogs take the whole screen on phones
+@media (max-width: 600px) {
+  .responsive-dialog {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    height: 100dvh;
+
+    .mat-mdc-dialog-surface {
+      border-radius: 0 !important;
+    }
+  }
+}
+
+// Printing a ticket prints only the ticket
+@media print {
+  @page {
+    margin: 8mm;
+  }
+
+  body > *:not(.cdk-overlay-container) {
+    display: none !important;
+  }
+
+  .cdk-overlay-backdrop {
+    display: none;
+  }
+
+  .cdk-overlay-pane {
+    position: static !important;
+    max-width: none !important;
+    width: 80mm !important;
+  }
+
+  .mat-mdc-dialog-surface {
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

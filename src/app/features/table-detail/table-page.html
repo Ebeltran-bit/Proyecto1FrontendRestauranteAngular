@@ -1,0 +1,123 @@
+<a mat-button routerLink="/sala" class="back">
+  <mat-icon>arrow_back</mat-icon>
+  {{ 'table.back' | t }}
+</a>
+
+@if (loading() && !table()) {
+  <div class="center-spinner"><mat-spinner diameter="40" /></div>
+} @else if (notFound()) {
+  <div class="card empty-state">
+    <mat-icon>search_off</mat-icon>
+    <h3>{{ 'table.notFound' | t }}</h3>
+    <a mat-flat-button routerLink="/sala">{{ 'table.back' | t }}</a>
+  </div>
+} @else if (table(); as table) {
+  <header class="page-header">
+    <div class="title">
+      <h1>{{ table.name }}</h1>
+      <span class="chip" [class]="table.status">
+        {{ (table.status === 'free' ? 'floor.statusFree' : 'floor.statusOccupied') | t }}
+      </span>
+    </div>
+    <button mat-flat-button (click)="openAdd()">
+      <mat-icon>add</mat-icon>
+      {{ 'table.addProduct' | t }}
+    </button>
+  </header>
+
+  <div class="layout">
+    <section class="card orders">
+      <h2 class="card-title">
+        {{ 'table.orders' | t }}
+        @if (orders().length) {
+          <span class="muted count">{{
+            (itemCount() === 1 ? 'table.oneItem' : 'table.items') | t: { count: itemCount() }
+          }}</span>
+        }
+      </h2>
+
+      @if (rows().length) {
+        <ul class="order-list">
+          @for (row of rows(); track row.order.id) {
+            <li class="order">
+              <div class="order-info">
+                <span class="order-name">{{ row.productName }}</span>
+                <span class="order-sub muted">
+                  {{ row.presentationName }} ·
+                  <span class="money">{{ row.order.unit_price | money }}</span>
+                </span>
+                @if (row.order.notes) {
+                  <span class="order-note"
+                    ><mat-icon>sticky_note_2</mat-icon>{{ row.order.notes }}</span
+                  >
+                }
+              </div>
+              <app-quantity-stepper
+                [value]="row.order.quantity"
+                [allowBelowMin]="true"
+                [disabled]="busy()"
+                (valueChange)="changeQuantity(row, $event)"
+              />
+              <span class="order-total money">{{ row.lineTotal | money }}</span>
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="orderMenu"
+                [attr.aria-label]="'table.edit' | t"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #orderMenu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="openEdit(row.order)">
+                  <mat-icon>edit</mat-icon>
+                  <span>{{ 'table.edit' | t }}</span>
+                </button>
+                <button mat-menu-item (click)="remove(row)">
+                  <mat-icon>delete</mat-icon>
+                  <span>{{ 'table.delete' | t }}</span>
+                </button>
+              </mat-menu>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>restaurant_menu</mat-icon>
+          <h3>{{ 'table.emptyTitle' | t }}</h3>
+          <p>{{ 'table.emptyText' | t }}</p>
+          <button mat-stroked-button (click)="openAdd()">
+            <mat-icon>add</mat-icon>
+            {{ 'table.addProduct' | t }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <aside class="card summary">
+      <mat-form-field class="waiter" [class.missing]="waiterMissing()" subscriptSizing="dynamic">
+        <mat-label>{{ 'table.waiter' | t }}</mat-label>
+        <mat-icon matPrefix>badge</mat-icon>
+        <mat-select [value]="table.waiter_id" (selectionChange)="assignWaiter($event.value)">
+          <mat-option [value]="null">{{ 'table.noWaiter' | t }}</mat-option>
+          @for (waiter of waiters(); track waiter.id) {
+            <mat-option [value]="waiter.id">{{ waiter.full_name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if (waiterMissing()) {
+        <p class="warning" role="alert">
+          <mat-icon>info</mat-icon>{{ 'table.payNeedsWaiter' | t }}
+        </p>
+      }
+
+      <div class="total-row">
+        <span>{{ 'table.total' | t }}</span>
+        <strong class="money">{{ total() | money }}</strong>
+      </div>
+
+      <button mat-flat-button class="pay" [disabled]="!orders().length" (click)="pay()">
+        <mat-icon>point_of_sale</mat-icon>
+        {{ 'table.pay' | t }}
+      </button>
+    </aside>
+  </div>
+}

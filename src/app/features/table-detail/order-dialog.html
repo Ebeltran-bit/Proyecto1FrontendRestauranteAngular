@@ -1,0 +1,101 @@
+<h2 mat-dialog-title>
+  {{
+    data.mode === 'add'
+      ? ('orderDialog.addTitle' | t: { table: data.tableName })
+      : ('orderDialog.editTitle' | t)
+  }}
+</h2>
+
+<mat-dialog-content class="content">
+  @if (data.mode === 'add') {
+    <mat-form-field class="search" subscriptSizing="dynamic">
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-label>{{ 'orderDialog.search' | t }}</mat-label>
+      <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" cdkFocusInitial />
+    </mat-form-field>
+
+    <mat-chip-listbox
+      class="categories"
+      [hideSingleSelectionIndicator]="true"
+      [value]="categoryId()"
+      (change)="categoryId.set($event.value ?? 0)"
+      [attr.aria-label]="'orderDialog.categories' | t"
+    >
+      <mat-chip-option [value]="0">{{ 'orderDialog.all' | t }}</mat-chip-option>
+      @for (category of menu.categories(); track category.id) {
+        <mat-chip-option [value]="category.id">{{ category.name }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+
+    <div class="products" role="listbox" [attr.aria-label]="'orderDialog.choose' | t">
+      @for (item of filteredProducts(); track item.id) {
+        <button
+          type="button"
+          class="product"
+          role="option"
+          [class.selected]="product()?.id === item.id"
+          [attr.aria-selected]="product()?.id === item.id"
+          (click)="select(item)"
+        >
+          <span class="product-name">{{ item.name }}</span>
+          <span class="product-price money">{{ item.presentations[0].price | money }}</span>
+        </button>
+      } @empty {
+        <p class="muted no-results">{{ 'orderDialog.noResults' | t }}</p>
+      }
+    </div>
+  }
+
+  @if (product(); as selected) {
+    <section class="details">
+      <h3>{{ selected.name }}</h3>
+
+      <span class="label">{{ 'orderDialog.presentation' | t }}</span>
+      <mat-button-toggle-group
+        class="presentations"
+        [hideSingleSelectionIndicator]="true"
+        [value]="presentationId()"
+        (change)="presentationId.set($event.value)"
+      >
+        @for (presentation of selected.presentations; track presentation.id) {
+          <mat-button-toggle [value]="presentation.id">
+            <span class="toggle-name">{{ presentation.name }}</span>
+            <span class="toggle-price money">{{ presentation.price | money }}</span>
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      <span class="label">{{ 'orderDialog.quantity' | t }}</span>
+      <app-quantity-stepper
+        [value]="quantity()"
+        [max]="maxQuantity"
+        (valueChange)="quantity.set($event)"
+      />
+
+      <mat-form-field class="notes">
+        <mat-label>{{ 'orderDialog.notes' | t }}</mat-label>
+        <textarea
+          matInput
+          rows="2"
+          [maxlength]="maxNotes"
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          [placeholder]="'orderDialog.notesHint' | t"
+        ></textarea>
+        <mat-hint align="end">{{ notes().length }} / {{ maxNotes }}</mat-hint>
+      </mat-form-field>
+    </section>
+  } @else {
+    <p class="muted choose">{{ 'orderDialog.choose' | t }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>{{ 'common.cancel' | t }}</button>
+  <button mat-flat-button [disabled]="!canSubmit()" (click)="submit()">
+    {{
+      (data.mode === 'add' ? 'orderDialog.add' : 'orderDialog.save')
+        | t: { total: (total() | money) }
+    }}
+  </button>
+</mat-dialog-actions>

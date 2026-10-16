@@ -1,0 +1,54 @@
+@let user = auth.user();
+<mat-toolbar class="topbar">
+  <a routerLink="/sala" class="brand-link"><app-brand /></a>
+
+  <nav class="nav desktop-only">
+    @for (link of visibleLinks(); track link.path) {
+      <a mat-button [routerLink]="link.path" routerLinkActive="active">
+        <mat-icon>{{ link.icon }}</mat-icon>
+        {{ link.label | t }}
+      </a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  <app-language-switch />
+  <app-theme-toggle />
+
+  @if (user) {
+    <button mat-button class="user-button" [matMenuTriggerFor]="userMenu">
+      <span class="avatar">{{ initials(user.full_name) }}</span>
+      <span class="user-text desktop-only">
+        <span class="user-name">{{ user.full_name }}</span>
+        <span class="user-role">{{ roleKey(user.role) | t }}</span>
+      </span>
+    </button>
+    <mat-menu #userMenu="matMenu" xPosition="before">
+      <div class="menu-header" mat-menu-item disabled>
+        <span class="user-name">{{ user.full_name }}</span>
+        <span class="user-role">{{ roleKey(user.role) | t }}</span>
+      </div>
+      <mat-divider />
+      <button mat-menu-item (click)="auth.logout()">
+        <mat-icon>logout</mat-icon>
+        <span>{{ 'nav.logout' | t }}</span>
+      </button>
+    </mat-menu>
+  }
+</mat-toolbar>
+
+<main class="page">
+  <router-outlet />
+</main>
+
+@if (visibleLinks().length > 1) {
+  <nav class="bottom-nav mobile-only">
+    @for (link of visibleLinks(); track link.path) {
+      <a [routerLink]="link.path" routerLinkActive="active">
+        <mat-icon>{{ link.icon }}</mat-icon>
+        <span>{{ link.label | t }}</span>
+      </a>
+    }
+  </nav>
+}

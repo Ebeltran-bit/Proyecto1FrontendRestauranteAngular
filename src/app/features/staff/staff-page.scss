@@ -1,0 +1,62 @@
+.group {
+  margin-bottom: 28px;
+
+  h2 {
+    margin: 0 0 12px;
+    font: var(--mat-sys-title-medium);
+    font-weight: 600;
+  }
+}
+
+.people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 10px 14px 16px;
+}
+
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  font: var(--mat-sys-title-small);
+  font-weight: 700;
+
+  &.manager {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+.person-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: var(--mat-sys-title-small);
+    font-weight: 600;
+  }
+
+  .muted {
+    font: var(--mat-sys-body-small);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

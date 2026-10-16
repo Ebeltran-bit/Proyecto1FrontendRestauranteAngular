@@ -1,0 +1,89 @@
+<div class="login">
+  <section class="hero">
+    <app-brand class="hero-brand" />
+    <div class="hero-body">
+      <h1>{{ 'login.heroTitle' | t }}</h1>
+      <p>{{ 'login.heroText' | t }}</p>
+      <ul>
+        <li><mat-icon>bolt</mat-icon>{{ 'login.heroPoint1' | t }}</li>
+        <li><mat-icon>receipt_long</mat-icon>{{ 'login.heroPoint2' | t }}</li>
+        <li><mat-icon>insights</mat-icon>{{ 'login.heroPoint3' | t }}</li>
+      </ul>
+    </div>
+    <p class="hero-foot">{{ 'app.tagline' | t }}</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-tools">
+      <app-language-switch />
+      <app-theme-toggle />
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <app-brand class="mobile-brand" />
+      <h2>{{ 'login.title' | t }}</h2>
+      <p class="muted">{{ 'login.subtitle' | t }}</p>
+
+      @if (expired()) {
+        <div class="notice"><mat-icon>schedule</mat-icon>{{ 'login.expired' | t }}</div>
+      }
+      @if (wrongCredentials()) {
+        <div class="notice error" role="alert">
+          <mat-icon>error</mat-icon>{{ 'login.wrongCredentials' | t }}
+        </div>
+      }
+
+      <mat-form-field>
+        <mat-label>{{ 'login.username' | t }}</mat-label>
+        <mat-icon matPrefix>person</mat-icon>
+        <input matInput formControlName="username" autocomplete="username" autocapitalize="none" />
+        @if (form.controls.username.hasError('required')) {
+          <mat-error>{{ 'common.required' | t }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>{{ 'login.password' | t }}</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input
+          matInput
+          formControlName="password"
+          autocomplete="current-password"
+          [type]="showPassword() ? 'text' : 'password'"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="showPassword.set(!showPassword())"
+          [attr.aria-label]="(showPassword() ? 'login.hidePassword' : 'login.showPassword') | t"
+        >
+          <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (form.controls.password.hasError('required')) {
+          <mat-error>{{ 'common.required' | t }}</mat-error>
+        }
+      </mat-form-field>
+
+      <button mat-flat-button class="submit" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <mat-spinner diameter="20" />
+        } @else {
+          {{ 'login.submit' | t }}
+        }
+      </button>
+
+      <div class="demo">
+        <span class="demo-title">{{ 'login.demoTitle' | t }}</span>
+        <div class="demo-list">
+          @for (account of demoAccounts; track account.username) {
+            <button type="button" class="demo-account" (click)="fill(account)">
+              <strong>{{ account.role | t }}</strong>
+              <span>{{ account.username }} · {{ account.password }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  </section>
+</div>
